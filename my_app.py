@@ -1,10 +1,15 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-from config import (p1_presets,
-                    p1_table1_labels)
+import menu_bar
+from menu_bar import MenuBar
 
-class Page1(ttk.Frame):
+import config
+p1_title_labels = config.p1_title_labels
+p1_presets = config.p1_presets
+p1_table1_labels = config.p1_table1_labels 
+
+class MyApp(ttk.Frame): # root from main.py
     """OOP refactor of previous procedural page1_table1.
 
     - Encapsulates all widgets and state
@@ -13,26 +18,65 @@ class Page1(ttk.Frame):
     - Makes it easier to add table2, presets, export, and testing
     """
 
-    def __init__(self, parent, *args, **kwargs):
-        super().__init__(parent, padding=15, *args, **kwargs)
+    def __init__(self, parent: tk.Tk, *args, **kwargs): # root is parent here
+
+        # initialization of the Frame (root from main.py -> parent here)--------------------------
         
-        # Make this frame fill its parent
-        self.pack(fill="both", expand=True)          # ← here (self = the frame)
-                                        
-        # parameters
+        
+        super().__init__(parent, padding=15, *args, **kwargs) # frame= ttk.Frame(root) in procedural version, now self = the frame itself, parent = root
+        self.parent = parent
+        self.pack(fill="both", expand=True)  # Make this frame fill its parent
+        
+        # MAIN WINDOW ----------------------------------------------------------------------------
+        self.parent.title(p1_title_labels["main_title"])
+        self.parent.minsize(600, 350)
+        self.parent.configure(bg="#E4E2E2")
+        self.parent.geometry("900x600")
+
+        # STYLE (FROM PyUIBuilder)----------------------------------------------------------------
+        style = ttk.Style(self.parent)
+        style.theme_use("vista")
+
+        style.configure(
+            "option_menu.TCombobox",
+            fieldbackground="#E4E2E2",
+            foreground="#000"
+        )    
+                                
+        # parameters -------------------------------------------------------------------------------
         self.presets = p1_presets
         self.table1_labels = p1_table1_labels
-          
+
         # state
-        self.selected = tk.StringVar(value="手动输入")
+        self.selected = tk.StringVar()
         self.entries = []  # list of Entry widgets for table1
         self.entries_by_table = {}
-
+    
         # build UI
+        self._build_menu()
         self._build_layout()
 
-    # ------------------------- builders ------------------------------
+    def _build_menu(self):
+        # create MenuBar after state exists
+        self.menu_bar = MenuBar(self.master, controller=self)
+        self.master.config(menu=self.menu_bar)
+ 
+    # ------------------------- builders --------------------------------
     def _build_layout(self):
+        # ===============================================================
+        # LAYOUT STRUCTURE
+        # ===============================================================
+        # root
+        # ├─ menu_bar
+        # └─ page1                    (pack, expand)
+        #     ├─ table_block1         (pack, expand)
+        #     │   ├─ header1          (pack)
+        #     │   │   ├─ title        (grid)
+        #     │   │   ├─ preset_lbl   (grid)
+        #     │   │   └─ preset_combo (grid)
+        #     │   └─ table_frame      (pack, expand)
+        #     │       └─ table1       (grid)
+        #     └─ footer               (pack)
         # Horizontal splitter: left pane for tables, right pane for main/plots
         paned = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         paned.pack(fill="both", expand=True)
@@ -52,25 +96,8 @@ class Page1(ttk.Frame):
         controls.grid(row=0, column=0, sticky="ew", pady=(0, 8))
         controls.grid_columnconfigure(0, weight=1)
 
-        right_container = ttk.Frame(controls)
-        right_container.grid(row=0, column=1, sticky="e")
-
-        ttk.Label(right_container, text="数据录入:", font=("Arial", 10)).pack(side="left", padx=(0, 8))
-
-        self.preset_combo = ttk.Combobox(
-            right_container,
-            values=["手动输入"] + list(self.presets.keys()),
-            textvariable=self.selected,
-            state="readonly",
-            font=("Arial", 9),
-            width=10,
-            style="option_menu.TCombobox"
-        )
-        self.preset_combo.pack(side="left")
-        self.preset_combo.bind("<<ComboboxSelected>>", self.apply_preset)
-
         # ── Table 1 (with custom larger title that includes Chinese labels) ────────────────────
-        title1 = ttk.Label(self.left_pane, text="一   基本参数", font=('Segoe UI', 16, 'bold'))
+        title1 = ttk.Label(self.left_pane, text=p1_title_labels["table1_title"], font=('Segoe UI', 16, 'bold'))
         lf1 = ttk.LabelFrame(self.left_pane, labelwidget=title1, padding=10) 
         lf1.grid(row=1, column=0, sticky="nsew")  
 
@@ -78,7 +105,7 @@ class Page1(ttk.Frame):
         self._build_table1(lf1)
 
         # ── Table 2 (same) ────────────────────────────────────────
-        title2 = ttk.Label(self.left_pane, text="二   运行速度图参数计算", font=('Segoe UI', 14, 'bold'))
+        title2 = ttk.Label(self.left_pane, text=p1_title_labels["table2_title"], font=('Segoe UI', 14, 'bold'))
         lf2 = ttk.LabelFrame(self.left_pane, labelwidget=title2, padding=10)
         lf2.grid(row=2, column=0, sticky="nsew")
         self.table2_frame = lf2
@@ -107,8 +134,8 @@ class Page1(ttk.Frame):
         parent.grid_columnconfigure(2, minsize=80, weight=1)
 
         # rows start at 0 (controls are outside lf1)
-        for r, (idx, label_text) in enumerate(self.table1_labels, start=0):
-            ttk.Label(parent, text=idx, font=("Arial", 12, "bold")).grid(
+        for r, label_text in enumerate(self.table1_labels, start=0):
+            ttk.Label(parent, text=str(r + 1), font=("Arial", 12, "bold")).grid(
                 row=r, column=0, padx=5, pady=4
             )
 
@@ -138,7 +165,7 @@ class Page1(ttk.Frame):
         self.clear_all()
 
         table1_data = self.presets.get(name, {}).get("table1", {})
-        for entry, (_, label_text) in zip(self.entries_by_table["table1"], self.table1_labels):
+        for entry, label_text in zip(self.entries_by_table["table1"], self.table1_labels):
             if label_text in table1_data:
                 entry.insert(0, table1_data[label_text])
 
