@@ -4,7 +4,8 @@ os.system('cls' if os.name == 'nt' else 'clear')  # clear console
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-import build_page1
+#import build_page1
+import page1
 
 
 # ===============================================================
@@ -27,9 +28,9 @@ import build_page1
 # =============================================================== 
 root = tk.Tk()
 root.title("双往复式客运缆车系统运行参数计算程序")
-#root.minsize(600, 350)
+root.minsize(600, 350)
 root.configure(bg="#E4E2E2")
-
+root.geometry("900x600")
 # ===============================================================
 # STYLE (FROM PyUIBuilder)
 # ===============================================================
@@ -82,11 +83,10 @@ menu_bar.add_cascade(label="File", menu=file_menu)
 # Page 1
 # ===============================================================
 # Compose page using the central `page1_table1` function (header + tables)
-build_page1.page1_table1(root)
+#build_page1.page1_table1(root)
+page1.Page1(root)
+
   
-
-
-
 
 
 
