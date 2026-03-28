@@ -173,16 +173,16 @@ plot_texts["page1"] = {}
 plot_texts["page1"]["plot1"] = {
 
     "title": {
-        "ZH": "运量与速度关系图",
-        "EN": "Capacity vs Speed Plot",
+        "ZH": "速度梯形图",
+        "EN": "Speed Profile",
     },
     "x_label": {
-        "ZH": "运行速度 (m/s)",
-        "EN": "Operating Speed (m/s)",
+        "ZH": "运行时间 (s)",
+        "EN": "Operating time (s)",
     },
     "y_label": {
-        "ZH": "小时运量 (人/小时)",
-        "EN": "Hourly Capacity (pax/h)",
+        "ZH": "运行速度 (m/s)",
+        "EN": "Operating Speed (m/s)",
     },
     "no_input_error_message": {
         "ZH": "请输入必要参数以预览图表",
