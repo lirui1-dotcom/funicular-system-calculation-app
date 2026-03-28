@@ -13,7 +13,7 @@ def page1_table2(parent):
     each row is a list of Entry widgets for the numeric columns.
     """
     table2_frame = ttk.Frame(parent)
-    table2_frame.pack(fill="both", expand=True, pady=(10, 0))
+    table2_frame.pack(fill="both", expand=True, pady=(10, 0)) 
 
     table2 = ttk.Frame(table2_frame, borderwidth=2, relief="solid", padding=8)
     table2.pack(fill="x")
