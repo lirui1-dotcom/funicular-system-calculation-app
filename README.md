@@ -100,7 +100,7 @@ python main.py
 
 ---
 
-## 🌐 Multi-language Support
+## 🌐 Multilingual Support
 
 ### How It Works
 
