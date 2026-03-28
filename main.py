@@ -4,8 +4,7 @@ os.system('cls' if os.name == 'nt' else 'clear')  # clear console
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-#import build_page1
-import build_page1_OPP
+import build_page1
 
 
 # ===============================================================
@@ -83,9 +82,7 @@ menu_bar.add_cascade(label="File", menu=file_menu)
 # Page 1
 # ===============================================================
 # Compose page using the central `page1_table1` function (header + tables)
-#build_page1.page1_table1(root)
-build_page1_OPP.page1_table1(root)
-
+build_page1.page1_table1(root)
   
 
 
