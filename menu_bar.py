@@ -22,8 +22,8 @@ class MenuBar(tk.Menu):
     def _build_menus(self):
         """Build all top-level menus here"""
         self._build_file_menu()
-        # Mode menu (moved from page controls)
-        self._build_mode_menu()
+        # Edit menu
+        self._build_edit_menu()
         # Language menu on the right
         self._build_language_menu()
     
@@ -47,40 +47,19 @@ class MenuBar(tk.Menu):
         # drop down 3
         file_menu.add_command(label=self.controller.get_text("exit", menu_texts), command=self.parent.quit)   
     
-    # ── mode menu ────────────────────────────────────────────────────────
-    def _build_mode_menu(self):
-        """When a mode is chosen we update the controller's selected StringVar
-        and call its apply_preset() method if provided.
-        """
-        mode_menu = tk.Menu(self, tearoff=0, font=("Arial", 9))
-        mode_label = self.controller.get_text("mode", menu_texts)
-        self.add_cascade(label=mode_label, menu=mode_menu)
-
-        # Use controller's StringVar if available, else create a local one
-        var = None
-        if self.controller and hasattr(self.controller, 'selected'):
-            var = self.controller.selected
-        else:
-            var = tk.StringVar(value=self.controller.get_text("default_mode", menu_texts) )
+    # ── edit menu ────────────────────────────────────────────────────────
+    def _build_edit_menu(self):
+        """Edit menu with Reset option"""
+        edit_menu = tk.Menu(self, tearoff=0, font=("Arial", 9))
+        edit_label = self.controller.get_text("edit", menu_texts)
+        self.add_cascade(label=edit_label, menu=edit_menu)
 
         # Reset option
-        reset_label = self.controller.get_text("default_mode", menu_texts)
-        mode_menu.add_radiobutton(
+        reset_label = self.controller.get_text("reset", menu_texts)
+        edit_menu.add_command(
             label=reset_label,           
-            variable=var,
-            value=reset_label,
-            command=self._on_mode_change
+            command=self._on_reset
         )
-
-        # Preset options
-        if self.controller and hasattr(self.controller, 'presets'):
-            for name in self.controller.presets.keys():
-                mode_menu.add_radiobutton(
-                    label=name, 
-                    variable=var, 
-                    value=name, 
-                    command=self._on_mode_change
-                )
 
     # ── language menu ────────────────────────────────────────────────────────
     def _build_language_menu(self):
@@ -123,13 +102,13 @@ class MenuBar(tk.Menu):
             return
         messagebox.showinfo("Export", f"Export to:\n{path}")
      
-    # ── mode menu command ──────────────────────────────────────────────────────── 
-    # Apply presets when mode selected from menu
-    def _on_mode_change(self):
+    # ── edit menu command ──────────────────────────────────────────────────────── 
+    # Reset when called from menu
+    def _on_reset(self):
         try:
-            # Check whether controller exists and has the apply_preset attribute/method
-            if self.controller and hasattr(self.controller, 'apply_preset'):
-               self.controller.apply_preset()
+            # Check whether controller exists and has the clear_page attribute/method
+            if self.controller and hasattr(self.controller, 'clear_page'):
+               self.controller.clear_page()
         except Exception: 
                # error handling can be added here
                pass

@@ -36,11 +36,11 @@ menu_texts = {
     },
     
     #menu option 2
-    "mode": {
-        "ZH": "模式",
-        "EN": "Mode",
+    "edit": {
+        "ZH": "编辑",
+        "EN": "Edit",
     },
-    "default_mode": {
+    "reset": {
         "ZH": "清零",
         "EN": "Reset",
     },
@@ -54,34 +54,38 @@ menu_texts = {
 
 
 # ==========================================================================================
-# Page 1 Titles (UI ONLY)
+# Titles (UI ONLY)
 # ==========================================================================================
 
-p1_title_texts = {
+title_texts= {}
+title_texts["main_title"] = {
+    "ZH": "双往复式客运缆车系统运行参数计算程序",
+    "EN": "Reversible Passenger Ropeway System Calculation Program",
+}
 
-    "p1_main_title": {
-        "ZH": "双往复式客运缆车系统运行参数计算程序",
-        "EN": "Reversible Passenger Ropeway System Calculation Program",
-    },
-
-    "p1_table1": {
+title_texts["page1"] = {
+    "table1": {
         "ZH": "一   基本参数",
         "EN": "I   Basic Parameters",
     },
-    "p1_table2": {
+    "table2": {
         "ZH": "二   计算结果",
         "EN": "II  Calculation Results",
     },
 }
 
 
+
 # ==========================================================================================
-# Page 1 – Table 1 Fields
-# (KEY = IDENTITY, LABEL = UI)
+# Page 1 
 # ==========================================================================================
 
-p1_table1_texts = {
-    "total_distance": {
+# table 1 fields (KEY = IDENTITY, LABEL = UI)
+table_texts={}
+table_texts["page1"] = {}
+table_texts["page1"]["table1"] = {
+
+   "total_distance": {
         "ZH": "运行总距离(m)",
         "EN": "Total Distance (m)",
     },
@@ -131,13 +135,11 @@ p1_table1_texts = {
     },
 }
 
+# Table 2 Fields (OUTPUTS)
 
-# ==========================================================================================
-# Page 1 – Table 2 Fields (OUTPUTS)
-# ==========================================================================================
+table_texts["page1"]["table2"] = {
 
-p1_table2_texts = {
-    "boarding_and_signal_time": {
+ "boarding_and_signal_time": {
         "ZH": "上下人及发送信号时间(s)",
         "EN": "Boarding & Signal Time (s)",
     },
@@ -157,7 +159,9 @@ p1_table2_texts = {
         "ZH": "计算日运量(人)",
         "EN": "Calculated Daily Capacity (persons)",
     },
+  
 }
+
 
 
 # ==========================================================================================
@@ -165,22 +169,42 @@ p1_table2_texts = {
 # (KEYS MUST MATCH FIELD KEYS — NEVER UI LABELS)
 # ==========================================================================================
 
-p1_presets = {
-    "参考项目1": {
-        "table1": {
-            "total_distance": "90.46960781",
-            "operating_speed": "1.5",
-            "working_days_per_year": "300",
-            "working_hours_per_day": "8",
-            "required_hourly_capacity": "600",
-            "effective_cabin_capacity": "121",
-            "cabins_per_group": "1",
-            "acceleration": "0.25",
-            "deceleration": "-0.25",
-            "braking_deceleration": "-0.1",
-            "crawl_speed": "0.1",
-            "crawl_distance": "0.5",
-        },
-        "table2": {},
-    }
+presets_texts = {
+    # presets label text
+    "label_text": {
+        "ZH": "参考项目",
+        "EN": "Presets",
+    },
+
+    # first drop down text
+    "default_option": {
+        "ZH": "手动输入",
+        "EN": "Manual Input",
+    },        
 }
+
+presets = {}
+presets["page1"] = {}
+presets["page1"]["table1"] = {}
+presets["page1"]["table1"]["opt1"] = {
+            "texts": {
+                "ZH": "参考项目1",
+                "EN": "Sample 1",
+            },
+            "data": {
+                "total_distance": "90.46960781",
+                "operating_speed": "1.5",
+                "working_days_per_year": "300",
+                "working_hours_per_day": "8",
+                "required_hourly_capacity": "600",
+                "effective_cabin_capacity": "121",
+                "cabins_per_group": "1",
+                "acceleration": "0.25",
+                "deceleration": "-0.25",
+                "braking_deceleration": "-0.1",
+                "crawl_speed": "0.1",
+                "crawl_distance": "0.5",
+            },          
+}
+
+
