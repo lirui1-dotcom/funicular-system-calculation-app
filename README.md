@@ -88,8 +88,8 @@ Funicular_cal_VF1.4/
 
 ```bash
 # Clone the repository
-git clone <repo-url>
-cd Funicular_cal_VF1.4
+git clone https://github.com/lirui1-dotcom/funicular-system-calculation-app
+cd funicular-system-calculation-app/Funicular_cal_VF1.4
 
 # Install dependencies
 pip install matplotlib
@@ -100,15 +100,18 @@ python main.py
 
 ---
 
-## 🌐 Internationalization
+## 🌐 Multi-language Support
 
-The app supports multiple languages:
+### How It Works
 
-```python
-# Switch languages via menu
-# All UI text, tables, plot labels update automatically
-```
+The app achieves seamless language switching through a **reactive text system**:
 
+1. **Centralized Config** — All UI text (Chinese/English) is stored in `core/config.py`
+2. **StringVar Observer** — Uses Tkinter's `StringVar` to track the current language as an observable state
+3. **Automatic Updates** — When users switch languages, all UI elements (tables, labels, plot text) refresh instantly
+4. **No Hardcoding** — Text is retrieved dynamically from config based on current language, never hardcoded in UI
+
+### Language Organization
 All language strings are centralized in `core/config.py`:
 ```python
 table_texts = {
@@ -134,6 +137,25 @@ Display Results
 
 ---
 
+## 📈 Plot Widget
+
+The plot widget (`page1_plot.py`) embeds a Matplotlib figure in Tkinter and provides:
+
+- **Reactive Resizing** — Figure automatically scales when window is resized or data updates
+- **Language-Aware Labels** — Title and axis labels update instantly when user switches languages
+- **Responsive Layout** — Canvas and toolbar grid-based layout ensures proper spacing
+- **CJK Font Support** — Uses Microsoft YaHei font for both Chinese and English text
+- **Error Handling** — Displays validation messages when input is missing or invalid
+
+The plot updates through `update_plot()` method, which:
+1. Validates input data
+2. Refreshes axis labels for current language
+3. Calculates cumulative time points
+4. Plots the velocity profile curve
+5. Applies tight layout and redraws canvas
+
+---
+
 ## 🔄 Preset System
 
 > [!TIP]
@@ -148,10 +170,7 @@ Display Results
 
 ## 📦 DPI Awareness
 
-The app supports high-DPI displays (e.g., 4K monitors) on Windows:
-```python
-# In main.py: SetProcessDpiAwareness(2) enables proper scaling
-```
+The app supports high-DPI displays (e.g., 4K monitors) on Windows. In `main.py`, `SetProcessDpiAwareness(2)` is called during initialization to enable proper scaling.
 
 ---
 
@@ -172,6 +191,39 @@ See [CHANGELOG.md](./CHANGELOG.md) for detailed version history and changes.
 2. Register in `my_app.py` (add to pages dict)
 3. Add text config to `core/config.py`
 4. Add menu option to `menu_bar.py`
+
+</details>
+
+<details>
+<summary><b>Adding a New Table</b></summary>
+
+Use the generic `table_manager.py` to create tables:
+
+```python
+from managers.table_manager import TableManager
+
+# In your page file
+table_manager = TableManager(parent_frame, app)
+
+# Create a table with language-aware headers
+table_manager.build_table(
+    table_key="table1",
+    headers=["Column 1", "Column 2", "Column 3"],
+    rows=3,
+    cols=3
+)
+
+# Retrieve table values (returns list of row data)
+values = table_manager.get_table_values("table1")
+
+# Set table values
+table_manager.set_table_values("table1", data=[["1", "2", "3"], ...])
+
+# Clear table
+table_manager.clear_table("table1")
+```
+
+All table text is auto-translated based on `current_language` from config.
 
 </details>
 
