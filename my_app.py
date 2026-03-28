@@ -1,13 +1,12 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
+from typing import Optional
 
 import menu_bar
 from menu_bar import MenuBar
 
 import config
-p1_title_labels = config.p1_title_labels
-p1_presets = config.p1_presets
-p1_table1_labels = config.p1_table1_labels 
+from config import p1_title_texts, p1_presets, p1_table1_texts, default_language, menu_texts, default_page
 
 class MyApp(ttk.Frame): # root from main.py
     """OOP refactor of previous procedural page1_table1.
@@ -24,16 +23,43 @@ class MyApp(ttk.Frame): # root from main.py
         
         
         super().__init__(parent, padding=15, *args, **kwargs) # frame= ttk.Frame(root) in procedural version, now self = the frame itself, parent = root
-        self.parent = parent
-        self.pack(fill="both", expand=True)  # Make this frame fill its parent
         
-        # MAIN WINDOW ----------------------------------------------------------------------------
-        self.parent.title(p1_title_labels["main_title"])
+        self.parent = parent
+        
+        # ── 1. State variables FIRST ────────────────────────────────────────────
+        self.current_language = tk.StringVar(value=default_language)
+        self.selected = tk.StringVar()
+        self.current_page_key = default_page
+        
+        # Note: For each ttk Label, there are 2 variables: 1. field keys(to know which text to pull from config), 
+        # 2. the actual Label widget (to call .config(text=...) on it)
+    
+        self.pages = {}
+        self.pages["page1"] = {
+            "tables": {
+                "table1": {"keys": [],     # field keys to know which text to pull from config for each row (for refresh)
+                       "entries": [],      # Entry widgets for table 1 (for data retrieval and preset application)
+                       "row_labels": [],   # Row label widgets for refresh
+                       "title_label": None # Label widget for table 1 title (for refresh)
+                       },
+                "table2": {"keys": [], "entries": [], "row_labels": [], "title_label": None}
+            }       
+        }
+
+        # ── 2. Data / configuration ─────────────────────────────────────────────
+        self.presets = p1_presets
+        # Texts for UI labels (menus, table titles, row labels)
+        self.p1_table1_texts = p1_table1_texts
+        self.p1_title_texts = p1_title_texts
+        self.menu_texts = menu_texts 
+        
+        # ── 3. Window setup (now safe to call methods) ──────────────────────────
+        self._update_window_title()
         self.parent.minsize(600, 350)
         self.parent.configure(bg="#E4E2E2")
         self.parent.geometry("900x600")
-
-        # STYLE (FROM PyUIBuilder)----------------------------------------------------------------
+        
+        # ── 4. Style ────────────────────────────────────────────────────────────
         style = ttk.Style(self.parent)
         style.theme_use("vista")
 
@@ -43,26 +69,25 @@ class MyApp(ttk.Frame): # root from main.py
             foreground="#000"
         )    
                                 
-        # parameters -------------------------------------------------------------------------------
-        self.presets = p1_presets
-        self.table1_labels = p1_table1_labels
-
-        # state
-        self.selected = tk.StringVar()
-        self.entries = []  # list of Entry widgets for table1
-        self.entries_by_table = {}
-    
-        # build UI
+        # ── 5. Build UI ─────────────────────────────────────────────────────────
         self._build_menu()
         self._build_layout()
+        
+        # Pack self last
+        self.pack(fill="both", expand=True)  # Make this frame fill its parent
 
+    # ===========================================================================
+    # BUILDERS
+    # ===========================================================================
     def _build_menu(self):
         # create MenuBar after state exists
         self.menu_bar = MenuBar(self.master, controller=self)
         self.master.config(menu=self.menu_bar)
- 
-    # ------------------------- builders --------------------------------
+
     def _build_layout(self):
+        """
+        Main layout: horizontal paned window with left (tables) and right (plots/content) pane
+        """
         # ===============================================================
         # LAYOUT STRUCTURE
         # ===============================================================
@@ -77,52 +102,62 @@ class MyApp(ttk.Frame): # root from main.py
         #     │   └─ table_frame      (pack, expand)
         #     │       └─ table1       (grid)
         #     └─ footer               (pack)
+
+        # ── Root-level splitter ────────────────────────────────────────────────────────────────
         # Horizontal splitter: left pane for tables, right pane for main/plots
         paned = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         paned.pack(fill="both", expand=True)
 
-        # Left pane (tables)
-        self.left_pane = ttk.Frame(paned, padding=12)
-        paned.add(self.left_pane, weight=1)
+        # ── LEFT PANE: Tables and controls ─────────────────────────────────────────────────────
+        LEFT_PANE_WEIGHT = 20
 
-        # Use grid inside left pane so we can stack a controls row + two table areas
-        self.left_pane.grid_rowconfigure(0, weight=0)  # controls
-        self.left_pane.grid_rowconfigure(1, weight=0)  # table1 keeps natural height
-        self.left_pane.grid_rowconfigure(2, weight=1)  # table2 fills remaining space
+        self.left_pane = ttk.Frame(paned, padding=12)
+        paned.add(self.left_pane, weight=LEFT_PANE_WEIGHT)
+
+        # Grid configuration inside left pane
+        self.left_pane.grid_rowconfigure(0, weight=0)    # controls row
+        self.left_pane.grid_rowconfigure(1, weight=0)    # table 1 (fixed height)
+        self.left_pane.grid_rowconfigure(2, weight=1)    # table 2 (expands)
         self.left_pane.grid_columnconfigure(0, weight=1)
 
-        # Controls row (preset combobox placed at top-right, above both tables)
-        controls = ttk.Frame(self.left_pane)
-        controls.grid(row=0, column=0, sticky="ew", pady=(0, 8))
-        controls.grid_columnconfigure(0, weight=1)
+        # ── Table 1 ────────────────────────────────────────────────────────────────────────────
+        title1_text = self.get_text("p1_table1", self.p1_title_texts)
+        title1_label = ttk.Label(
+            self.left_pane,
+            text=title1_text,
+            font=('Segoe UI', 16, 'bold')
+        )
+        self.pages["page1"]["tables"]["table1"]["title_label"] = title1_label
+        lf1 = ttk.LabelFrame(self.left_pane, labelwidget=title1_label, padding=10)
+        lf1.grid(row=1, column=0, sticky="nsew")
 
-        # ── Table 1 (with custom larger title that includes Chinese labels) ────────────────────
-        title1 = ttk.Label(self.left_pane, text=p1_title_labels["table1_title"], font=('Segoe UI', 16, 'bold'))
-        lf1 = ttk.LabelFrame(self.left_pane, labelwidget=title1, padding=10) 
-        lf1.grid(row=1, column=0, sticky="nsew")  
-
-        # table area inside lf1
+        # Build table 1 content inside the labelframe
         self._build_table1(lf1)
 
-        # ── Table 2 (same) ────────────────────────────────────────
-        title2 = ttk.Label(self.left_pane, text=p1_title_labels["table2_title"], font=('Segoe UI', 14, 'bold'))
-        lf2 = ttk.LabelFrame(self.left_pane, labelwidget=title2, padding=10)
+        # ── Table 2 ────────────────────────────────────────────────────────────────────────────
+        title2_text = self.get_text("p1_table2", self.p1_title_texts)
+        title2_label = ttk.Label(
+            self.left_pane,
+            text=title2_text,
+            font=('Segoe UI', 14, 'bold')
+        )
+        self.pages["page1"]["tables"]["table2"]["title_label"] = title2_label
+        lf2 = ttk.LabelFrame(self.left_pane, labelwidget=title2_label, padding=10)
         lf2.grid(row=2, column=0, sticky="nsew")
         self.table2_frame = lf2
 
-        # Right pane (main area / plots)
+        # ── RIGHT PANE: Main content / plots ───────────────────────────────────────────────────
+        RIGHT_PANE_WEIGHT = 100 - LEFT_PANE_WEIGHT
+
         self.right_pane = ttk.Frame(paned, padding=20)
-        paned.add(self.right_pane, weight=65)
+        paned.add(self.right_pane, weight=RIGHT_PANE_WEIGHT)
 
-        # right_pane left empty for plots (will be added later)
+        # Right pane currently empty (plots/content will be added later)
 
-        # map for later preset handling
-        self.entries_by_table = {"table1": self.entries}
-
-        # footer
+        # ── Additional setup ───────────────────────────────────────────────────────────────────
+        # Footer (full width, bottom)
         self.footer = ttk.Frame(self)
         self.footer.pack(fill="x", pady=(10, 0))
-
 
 
     def _build_table1(self, parent):
@@ -134,50 +169,121 @@ class MyApp(ttk.Frame): # root from main.py
         parent.grid_columnconfigure(2, minsize=80, weight=1)
 
         # rows start at 0 (controls are outside lf1)
-        for r, label_text in enumerate(self.table1_labels, start=0):
+        
+        for r, field_key in enumerate(self.p1_table1_texts.keys(), start=0):
+            self.pages["page1"]["tables"]["table1"]["keys"].append(field_key) # Store the field key from config
+            label_text = self.get_text(field_key, self.p1_table1_texts)
+            
+            # Row structure: index | label | entry
+            # create index label (1, 2, 3, ...)
             ttk.Label(parent, text=str(r + 1), font=("Arial", 12, "bold")).grid(
                 row=r, column=0, padx=5, pady=4
             )
-
-            ttk.Label(parent, text=label_text, font=("Arial", 12)).grid(
-                row=r, column=1, padx=5, pady=4, sticky="w"
-            )
-
+            # create field label
+            row_label = ttk.Label(parent, text=label_text, font=("Arial", 12))
+            row_label.grid(row=r, column=1, padx=5, pady=4, sticky="w")
+            self.pages["page1"]["tables"]["table1"]["row_labels"].append(row_label)  # Store for refresh
+            # create entry
             e = ttk.Entry(parent, justify="right", font=("Arial", 12), width=11)
             # align entries to the left of their column so they sit closer to labels
             e.grid(row=r, column=2, padx=5, pady=4, sticky="e")
-            self.entries.append(e)
+            self.pages["page1"]["tables"]["table1"]["entries"].append(e)
 
 
-    # ------------------------- actions -------------------------------
-    def clear_all(self):
-        for entry_list in self.entries_by_table.values():
-            for entry in entry_list:
+    # ===========================================================================
+    # REFRESH HELPERS
+    # ===========================================================================
+    def refresh_ui(self):
+        """Refresh all UI labels when language changes"""
+        self._update_window_title()
+        # Update menu will automatically refresh since it rebuilds based on current_language
+        if hasattr(self, 'menu_bar'):
+            self.master.config(menu=None)
+            self._build_menu()
+        # Update tables
+        self._refresh_table_titles()
+        self._refresh_table1_rows()
+
+    # update main window title based on current language
+    def _update_window_title(self): 
+        """Update window title based on current language"""
+        title = self.get_text("p1_main_title", self.p1_title_texts) 
+        self.parent.title(title)
+
+    def _refresh_table1_rows(self):
+        """Refresh table1 row labels when language changes"""
+        for r, field_key in enumerate(self.pages["page1"]["tables"]["table1"]["keys"]):
+            self.pages["page1"]["tables"]["table1"]["row_labels"][r].config(text=
+                                            self.get_text(field_key, self.p1_table1_texts)
+                                            )
+
+    def _refresh_table_titles(self):
+        """Refresh table titles when language changes"""
+        self.pages["page1"]["tables"]["table1"]["title_label"].config(text=
+                                       self.get_text("p1_table1", self.p1_title_texts)
+                                       )
+        self.pages["page1"]["tables"]["table2"]["title_label"].config(text=
+                                       self.get_text("p1_table2", self.p1_title_texts)
+                                       )
+
+
+    # ===========================================================================
+    # ACTIONS
+    # ===========================================================================
+    def clear_page(self, page_key: Optional[str] = None) -> None:
+        # in python 3.10+ we can use clear_page(self, page_key: str | None = None) -> None:
+        """Clears all input fields on the given page (or current page if None)."""
+        if page_key is None:
+            page_key = self.current_page_key
+
+        if page_key not in self.pages:
+            return
+
+        for table in self.pages[page_key]["tables"].values():
+            for entry in table.get("entries", []):
                 entry.delete(0, tk.END)
 
     def apply_preset(self, event=None):
         name = self.selected.get()
 
-        if name == "手动输入":
-            self.clear_all()
+        reset_text = self.get_text("default_mode", self.menu_texts)
+        if name == reset_text or name == "":
+            self.clear_page()
             return
 
-        self.clear_all()
+        self.clear_page()
 
         table1_data = self.presets.get(name, {}).get("table1", {})
-        for entry, label_text in zip(self.entries_by_table["table1"], self.table1_labels):
-            if label_text in table1_data:
-                entry.insert(0, table1_data[label_text])
+        for entry, field_key in zip(self.pages["page1"]["tables"]["table1"]["entries"], 
+                                    self.pages["page1"]["tables"]["table1"]["keys"]):
+            if field_key in table1_data:
+                entry.insert(0, table1_data[field_key])
 
-    # ------------------------- helpers -------------------------------
+
+    # ===========================================================================
+    # HELPERS / UTILITIES
+    # ===========================================================================
+    def get_text(self, key, label_dict):
+        """
+        Get label in the currently selected language from the given dictionary.
+        Falls back to default_language if missing.
+        Last resort: returns the key itself.
+        """
+        lang = self.current_language.get()
+        entry = label_dict.get(key, {})
+        return entry.get(lang) or entry.get(default_language) or key  # current lang -> default lang -> key
+
+
+    # ===========================================================================
+    # GETTERS / SETTERS
+    # ===========================================================================
     def get_table1_values(self):
-        return [e.get() for e in self.entries]
+        return [e.get() for e in self.pages["page1"]["tables"]["table1"]["entries"]]
 
     def set_table1_values(self, values):
-        for e, v in zip(self.entries, values):
+        for e, v in zip(self.pages["page1"]["tables"]["table1"]["entries"], values):
             e.delete(0, tk.END)
             e.insert(0, v)
-
 
 
 # def page1_table2(root):

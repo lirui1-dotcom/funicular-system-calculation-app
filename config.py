@@ -1,85 +1,186 @@
-# =============================================================================================================
-# Menue Labels
-# =============================================================================================================    
+# ==========================================================================================
+# Language
+# ==========================================================================================
 
-menu_bar_labels = {
-    "file_menu": "文件",
-        "import_excel": "导入 Excel…",
-        "export_excel":  "导出 Excel…",
-        "exit": "退出",
-    "mode_menu": "模式",
-        "default_mode": "清零",
+default_language = "ZH"
+supported_languages = ("ZH", "EN")
+
+default_page = "page1"
+
+# ==========================================================================================
+# Menu Labels (UI ONLY)
+# ==========================================================================================
+
+# ==========================================================================================
+# Menu Labels (UI ONLY, CONSISTENT STRUCTURE)
+# ==========================================================================================
+
+menu_texts = {
+
+    # menu option 1
+    "file": {
+        "ZH": "文件",
+        "EN": "File",
+    },
+    "import_excel": {
+        "ZH": "导入 Excel…",
+        "EN": "Import Excel…",
+    },
+    "export_excel": {
+        "ZH": "导出 Excel…",
+        "EN": "Export Excel…",
+    },
+    "exit": {
+        "ZH": "退出",
+        "EN": "Exit",
+    },
+    
+    #menu option 2
+    "mode": {
+        "ZH": "模式",
+        "EN": "Mode",
+    },
+    "default_mode": {
+        "ZH": "清零",
+        "EN": "Reset",
+    },
+
+    #menu option 3
+    "language": {
+        "ZH": "语言",
+        "EN": "Language",
+    },
 }
 
-# ============================================================================================================
-# PAGE 1 
-# ============================================================================================================
 
-# ─────────────────────────────────────────────────────────────────────
-# Title Labels
-# ─────────────────────────────────────────────────────────────────────
-p1_title_labels = {
-    "main_title": "双往复式客运缆车系统运行参数计算程序",
-    "table1_title": "一   基本参数",
-    "table2_title": "二   计算结果",
-} 
+# ==========================================================================================
+# Page 1 Titles (UI ONLY)
+# ==========================================================================================
 
-# ─────────────────────────────────────────────────────────────────────
-# Table Labels
-# ─────────────────────────────────────────────────────────────────────
+p1_title_texts = {
 
-# Display labels / field descriptions used in UI or report
-# Order is important — corresponds to display sequence
-p1_table1_labels = [
-    "运行总距离(m)",
-    "运行速度(m/s)",
-    "年工作天数(d)",
-    "日工作小时数(h)", 
-    "要求小时运量(P/h)",
-    "缆车有效定员(人)",
-    "每组车厢数",
-    "加速度(m/s²)",
-    "减速度(m/s²)",
-    "制动段减速度 (m/s²)",
-    "爬行速度(m/s)",
-    "爬行距离(m)",
-]
- 
-p2_table2_labeles={
-    "单向运行参数合计",
-    "上下人及发送信号时间(s)",
-    "单趟运行总时间(s)",
-    "小时运行次数",
-    "计算小时运量(人)",
-    "要求小时运量(P/h)",
-    "计算日运量(人)",
+    "p1_main_title": {
+        "ZH": "双往复式客运缆车系统运行参数计算程序",
+        "EN": "Reversible Passenger Ropeway System Calculation Program",
+    },
+
+    "p1_table1": {
+        "ZH": "一   基本参数",
+        "EN": "I   Basic Parameters",
+    },
+    "p1_table2": {
+        "ZH": "二   计算结果",
+        "EN": "II  Calculation Results",
+    },
 }
 
-# ─────────────────────────────────────────────────────────────────────
+
+# ==========================================================================================
+# Page 1 – Table 1 Fields
+# (KEY = IDENTITY, LABEL = UI)
+# ==========================================================================================
+
+p1_table1_texts = {
+    "total_distance": {
+        "ZH": "运行总距离(m)",
+        "EN": "Total Distance (m)",
+    },
+    "operating_speed": {
+        "ZH": "运行速度(m/s)",
+        "EN": "Operating Speed (m/s)",
+    },
+    "working_days_per_year": {
+        "ZH": "年工作天数(d)",
+        "EN": "Working Days per Year (d)",
+    },
+    "working_hours_per_day": {
+        "ZH": "日工作小时数(h)",
+        "EN": "Working Hours per Day (h)",
+    },
+    "required_hourly_capacity": {
+        "ZH": "要求小时运量(P/h)",
+        "EN": "Required Hourly Capacity (P/h)",
+    },
+    "effective_cabin_capacity": {
+        "ZH": "缆车有效定员(人)",
+        "EN": "Effective Cabin Capacity (persons)",
+    },
+    "cabins_per_group": {
+        "ZH": "每组车厢数",
+        "EN": "Cabins per Group",
+    },
+    "acceleration": {
+        "ZH": "加速度(m/s²)",
+        "EN": "Acceleration (m/s²)",
+    },
+    "deceleration": {
+        "ZH": "减速度(m/s²)",
+        "EN": "Deceleration (m/s²)",
+    },
+    "braking_deceleration": {
+        "ZH": "制动段减速度 (m/s²)",
+        "EN": "Braking Deceleration (m/s²)",
+    },
+    "crawl_speed": {
+        "ZH": "爬行速度(m/s)",
+        "EN": "Crawl Speed (m/s)",
+    },
+    "crawl_distance": {
+        "ZH": "爬行距离(m)",
+        "EN": "Crawl Distance (m)",
+    },
+}
+
+
+# ==========================================================================================
+# Page 1 – Table 2 Fields (OUTPUTS)
+# ==========================================================================================
+
+p1_table2_texts = {
+    "boarding_and_signal_time": {
+        "ZH": "上下人及发送信号时间(s)",
+        "EN": "Boarding & Signal Time (s)",
+    },
+    "total_trip_time": {
+        "ZH": "单趟运行总时间(s)",
+        "EN": "Total Trip Time (s)",
+    },
+    "hourly_runs": {
+        "ZH": "小时运行次数",
+        "EN": "Hourly Runs",
+    },
+    "calculated_hourly_capacity": {
+        "ZH": "计算小时运量(人)",
+        "EN": "Calculated Hourly Capacity (persons)",
+    },
+    "calculated_daily_capacity": {
+        "ZH": "计算日运量(人)",
+        "EN": "Calculated Daily Capacity (persons)",
+    },
+}
+
+
+# ==========================================================================================
 # Presets
-# ─────────────────────────────────────────────────────────────────────
+# (KEYS MUST MATCH FIELD KEYS — NEVER UI LABELS)
+# ==========================================================================================
 
-# Predefined / example configurations (can be selected in UI)
 p1_presets = {
-
     "参考项目1": {
         "table1": {
-            "运行总距离(m)":        "90.46960781",
-            "运行速度(m/s)":        "1.5",
-            "年工作天数(d)":        "300",
-            "日工作小时数(h)":      "8",
-            "要求小时运量(P/h)":    "600",
-            "缆车有效定员(人)":     "121",
-            "每组车厢数":           "1",
-            "加速度(m/s²)":        "0.25",
-            "减速度(m/s²)":        "-0.25",
-            "制动段减速度 (m/s²)":  "-0.1",
-            "爬行速度(m/s)":       "0.1",
-            "爬行距离(m)":         "0.5",
+            "total_distance": "90.46960781",
+            "operating_speed": "1.5",
+            "working_days_per_year": "300",
+            "working_hours_per_day": "8",
+            "required_hourly_capacity": "600",
+            "effective_cabin_capacity": "121",
+            "cabins_per_group": "1",
+            "acceleration": "0.25",
+            "deceleration": "-0.25",
+            "braking_deceleration": "-0.1",
+            "crawl_speed": "0.1",
+            "crawl_distance": "0.5",
         },
-        "table2": {
-            # Table 2 preset values can be added here in the future, but currently table 2 has no presets
-            # (e.g. acceleration profiles, dwell times, etc.)
-        },
-    },
+        "table2": {},
+    }
 }

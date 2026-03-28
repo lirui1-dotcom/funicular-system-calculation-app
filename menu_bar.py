@@ -1,66 +1,78 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-from config import (menu_bar_labels)
-
-# file menu labels
-menu_lable_1 = menu_bar_labels["file_menu"]
-file_dropdown_labels = [
-    menu_bar_labels["import_excel"],
-    menu_bar_labels["export_excel"],
-    menu_bar_labels["exit"]
-]
-# mode menu labels
-menu_lable_2 = menu_bar_labels["mode_menu"]
-default_mode = menu_bar_labels["default_mode"]
+from config import menu_texts, default_language, supported_languages
 
 class MenuBar(tk.Menu):
-    
+
     def __init__(self, parent: tk.Tk, controller=None): 
         super().__init__(parent, font=("Arial", 12), tearoff=0) # menu bar initialization
         self.parent = parent
-        self.controller = controller  # optional: main app instance for shared state
+        self.controller = controller  
+
+        self.current_language = tk.StringVar(value=default_language)
+        if controller and hasattr(controller, 'current_language'):
+            self.current_language = controller.current_language
 
         self._build_menus()
 
+    # ===========================================================================
+    #  Build Menus
+    # ===========================================================================
     def _build_menus(self):
         """Build all top-level menus here"""
         self._build_file_menu()
         # Mode menu (moved from page controls)
         self._build_mode_menu()
-
+        # Language menu on the right
+        self._build_language_menu()
+    
+    # ── file menu ────────────────────────────────────────────────────────
     def _build_file_menu(self):  
-        file_menu = tk.Menu(self, tearoff=0, font=("Arial", 9)) # file_menu = tk.Menu(...)  # dropdown items
-        self.add_cascade(label=menu_lable_1, menu=file_menu)
-
-        file_menu.add_command(label=file_dropdown_labels[0], command=self.import_excel)
-        file_menu.add_command(label=file_dropdown_labels[1], command=self.export_excel)
-        file_menu.add_separator() #---------
-        file_menu.add_command(label=file_dropdown_labels[2], command=self.parent.quit)   
-
+        file_menu = tk.Menu(self, tearoff=0, font=("Arial", 9))
+        file_label = self.controller.get_text("file", menu_texts) 
+        self.add_cascade(label=file_label, menu=file_menu)
+        #drop down 1
+        file_menu.add_command(
+            label=self.controller.get_text("import_excel", menu_texts), 
+            command=self.import_excel
+            )
+        #drop down 2
+        file_menu.add_command(
+            label=self.controller.get_text("export_excel", menu_texts), 
+            command=self.export_excel
+            )
+        # ---- separator ----
+        file_menu.add_separator()
+        # drop down 3
+        file_menu.add_command(label=self.controller.get_text("exit", menu_texts), command=self.parent.quit)   
+    
+    # ── mode menu ────────────────────────────────────────────────────────
     def _build_mode_menu(self):
-        """ When a mode is chosen we update the controller's selected StringVar
+        """When a mode is chosen we update the controller's selected StringVar
         and call its apply_preset() method if provided.
         """
         mode_menu = tk.Menu(self, tearoff=0, font=("Arial", 9))
-        self.add_cascade(label=menu_lable_2, menu=mode_menu)
+        mode_label = self.controller.get_text("mode", menu_texts)
+        self.add_cascade(label=mode_label, menu=mode_menu)
 
         # Use controller's StringVar if available, else create a local one
         var = None
         if self.controller and hasattr(self.controller, 'selected'):
             var = self.controller.selected
         else:
-            var = tk.StringVar(value=default_mode)
-        
-        # first dropdown 
+            var = tk.StringVar(value=self.controller.get_text("default_mode", menu_texts) )
+
+        # Reset option
+        reset_label = self.controller.get_text("default_mode", menu_texts)
         mode_menu.add_radiobutton(
-            label=default_mode,           
+            label=reset_label,           
             variable=var,
-            value=default_mode,
+            value=reset_label,
             command=self._on_mode_change
         )
 
-        # second dropdown 
+        # Preset options
         if self.controller and hasattr(self.controller, 'presets'):
             for name in self.controller.presets.keys():
                 mode_menu.add_radiobutton(
@@ -70,8 +82,26 @@ class MenuBar(tk.Menu):
                     command=self._on_mode_change
                 )
 
-    # ── Command methods ────────────────────────────────────────────────────────
-    # These can be called directly or overridden in subclasses
+    # ── language menu ────────────────────────────────────────────────────────
+    def _build_language_menu(self):
+        """Build language selection menu on the right side"""
+        lang_menu = tk.Menu(self, tearoff=0, font=("Arial", 9))
+        lang_label = self.controller.get_text("language", menu_texts)
+        self.add_cascade(label=lang_label, menu=lang_menu)
+        
+        for lang_code in supported_languages:
+            lang_menu.add_radiobutton(
+                label=lang_code,
+                variable=self.current_language,
+                value=lang_code,
+                command=self._on_language_change
+            )
+
+    # ===========================================================================
+    #  Action/Command methods 
+    # ===========================================================================
+
+    # ── file menu commands ────────────────────────────────────────────────────────
     def import_excel(self):
         path = filedialog.askopenfilename(
             filetypes=[("Excel files", "*.xlsx *.xls")]
@@ -92,8 +122,8 @@ class MenuBar(tk.Menu):
         if not path:
             return
         messagebox.showinfo("Export", f"Export to:\n{path}")
-
-    # ── helpers ────────────────────────────────────────────────────────
+     
+    # ── mode menu command ──────────────────────────────────────────────────────── 
     # Apply presets when mode selected from menu
     def _on_mode_change(self):
         try:
@@ -104,6 +134,17 @@ class MenuBar(tk.Menu):
                # error handling can be added here
                pass
 
+    # ── language menu command ────────────────────────────────────────────────────
+    def _on_language_change(self):
+        """Refresh UI when language changes"""
+        try:
+            if self.controller and hasattr(self.controller, 'refresh_ui'):
+                self.controller.refresh_ui()
+        except Exception:
+            pass           
 
 
-
+    # ===========================================================================
+    #  Helpers
+    # ===========================================================================
+  
