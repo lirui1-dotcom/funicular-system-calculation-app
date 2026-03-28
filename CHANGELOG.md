@@ -9,6 +9,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added dedicated Reset button in the footer (clears all pages globally)
 
+
+
+## [1.4] - 2026-03-18
+
+### Added
+- Embedded Matplotlib velocity-time preview plot in right pane (Page1Plot widget)
+- Language-aware text system for plot (title, labels, error messages support ZH/EN)
+- `_get_plot_text()` method in Page1Plot for retrieving language-specific plot text from config
+- `FONTNAME` constant for CJK and Latin character support in plot widget
+- `_refresh_axes_labels()` method to update plot labels when language changes
+- `plot_texts` configuration in config.py with language-aware plot labels and error messages
+- Initial 150ms startup delay (`_init_resize()`) to ensure container dimensions are measured before plot sizing
+- Manual resize trigger in data update path (`_canvas_resize()` in `_plot_data()`)
+
+### Changed
+- Refactored plot architecture: Page1Plot now receives `app` instance via constructor for accessing shared state
+- Modified `my_app.py` to pass app reference to Page1Plot (enables language/config access)
+- Updated `page1.py` to pass app instance when instantiating Page1Plot
+- Fixed Y-axis label cropping: added manual `_canvas_resize()` call in `_plot_data()` before `tight_layout()`
+- Simplified font handling in `page1_plot.py`: replaced `FontProperties(fname=...)` approach with direct `fontname="Microsoft YaHei"` parameter
+- Plot now triggers `_refresh_axes_labels()` in `update_plot()` to handle language changes dynamically
+- Error messages in plot now read from config (no_input_error_message, invalid_input_error_message)
+
+### Removed
+- Removed unnecessary imports (`font_manager`, `FontProperties`) from `page1_plot.py` 
+- Removed `_FONT_PROP` global variable (replaced with simple FONTNAME constant)
+- Removed event-driven-only resize limitation (plot now manually resizes on data update)
+
+
+## [1.3.2] - 2026-03-09
+
+
+### Added
+- self.pages now specify if a table is readonly, and if so, such tables are bypassed when apply_preset, clear_page are called
+
+### Changed
+- Separated page1 UI logic into a dedicated `Pages/page1.py` file with `Page1` class for better modularity
+- Updated `my_app.py` to import and instantiate `Page1` instead of building layout directly
+
+### Removed
+
+
+
 ## [1.3.1] - 2026-02-26
 
 ### Added

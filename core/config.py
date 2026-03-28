@@ -1,8 +1,10 @@
+__all__=['table_texts', 'presets_texts', 'title_texts', 'presets', 'default_language', 
+         'menu_texts', 'default_page', 'plot_texts']
 # ==========================================================================================
 # Language
 # ==========================================================================================
 
-default_language = "ZH"
+default_language = "EN"
 supported_languages = ("ZH", "EN")
 
 default_page = "page1"
@@ -59,8 +61,8 @@ menu_texts = {
 
 title_texts= {}
 title_texts["main_title"] = {
-    "ZH": "双往复式客运缆车系统运行参数计算程序",
-    "EN": "Reversible Passenger Ropeway System Calculation Program",
+    "ZH": "客运缆车系统运行参数计算程序",
+    "EN": "Passenger Funicular Railway Operating Parameters Calculation Program",
 }
 
 title_texts["page1"] = {
@@ -84,8 +86,7 @@ title_texts["page1"] = {
 table_texts={}
 table_texts["page1"] = {}
 table_texts["page1"]["table1"] = {
-
-   "total_distance": {
+    "total_distance": {
         "ZH": "运行总距离(m)",
         "EN": "Total Distance (m)",
     },
@@ -103,7 +104,7 @@ table_texts["page1"]["table1"] = {
     },
     "required_hourly_capacity": {
         "ZH": "要求小时运量(P/h)",
-        "EN": "Required Hourly Capacity (P/h)",
+        "EN": "Required Hourly Capacity (persons/h)",
     },
     "effective_cabin_capacity": {
         "ZH": "缆车有效定员(人)",
@@ -123,45 +124,75 @@ table_texts["page1"]["table1"] = {
     },
     "braking_deceleration": {
         "ZH": "制动段减速度 (m/s²)",
-        "EN": "Braking Deceleration (m/s²)",
+        "EN": "Braking Section Deceleration (m/s²)",
     },
-    "crawl_speed": {
+    "creep_speed": {
         "ZH": "爬行速度(m/s)",
-        "EN": "Crawl Speed (m/s)",
+        "EN": "Creep Speed (m/s)",
     },
-    "crawl_distance": {
+    "creep_distance": {
         "ZH": "爬行距离(m)",
-        "EN": "Crawl Distance (m)",
+        "EN": "Creep Distance (m)",
     },
 }
 
 # Table 2 Fields (OUTPUTS)
 
 table_texts["page1"]["table2"] = {
-
- "boarding_and_signal_time": {
+    "station_dwell_time": {
         "ZH": "上下人及发送信号时间(s)",
-        "EN": "Boarding & Signal Time (s)",
+        "EN": "Station Dwell Time (s)",
     },
-    "total_trip_time": {
-        "ZH": "单趟运行总时间(s)",
-        "EN": "Total Trip Time (s)",
+    "one_way_cycle_time": {                    # ← replaced / modernized
+        "ZH": "单程运行时间(s)",
+        "EN": "One-Way Cycle Time (s)",
     },
-    "hourly_runs": {
+    "trips_per_hour": {
         "ZH": "小时运行次数",
-        "EN": "Hourly Runs",
+        "EN": "Trips per Hour",
     },
-    "calculated_hourly_capacity": {
-        "ZH": "计算小时运量(人)",
-        "EN": "Calculated Hourly Capacity (persons)",
+    "hourly_passenger_volume": {
+        "ZH": "计算小时运量(人/小时)",
+        "EN": "Hourly Passenger Volume (pax/h)"
     },
-    "calculated_daily_capacity": {
-        "ZH": "计算日运量(人)",
-        "EN": "Calculated Daily Capacity (persons)",
+    "daily_passenger_volume": {
+        "ZH": "计算日运量(人/天)",
+        "EN": "Daily Passenger Volume (pax/day)"
     },
-  
+    "annual_passenger_volume": {
+        "ZH": "计算年运量(万人/年)",
+        "EN": "Annual Passenger Volume (×10k pax)"
+}
 }
 
+# ==========================================================================================
+# Plot texts
+# ==========================================================================================
+plot_texts = {}
+plot_texts["page1"] = {}
+plot_texts["page1"]["plot1"] = {
+
+    "title": {
+        "ZH": "运量与速度关系图",
+        "EN": "Capacity vs Speed Plot",
+    },
+    "x_label": {
+        "ZH": "运行速度 (m/s)",
+        "EN": "Operating Speed (m/s)",
+    },
+    "y_label": {
+        "ZH": "小时运量 (人/小时)",
+        "EN": "Hourly Capacity (pax/h)",
+    },
+    "no_input_error_message": {
+        "ZH": "请输入必要参数以预览图表",
+        "EN": "Please enter required parameters to preview chart",
+    },
+    "invalid_input_error_message": {
+        "ZH": "输入参数无效，请检查参数并重试",
+        "EN": "Preview unavailable due to invalid inputs",
+    },
+}
 
 
 # ==========================================================================================
@@ -188,7 +219,7 @@ presets["page1"] = {}
 presets["page1"]["table1"] = {}
 presets["page1"]["table1"]["opt1"] = {
             "texts": {
-                "ZH": "参考项目1",
+                "ZH": "参考项目 1",
                 "EN": "Sample 1",
             },
             "data": {
@@ -202,8 +233,8 @@ presets["page1"]["table1"]["opt1"] = {
                 "acceleration": "0.25",
                 "deceleration": "-0.25",
                 "braking_deceleration": "-0.1",
-                "crawl_speed": "0.1",
-                "crawl_distance": "0.5",
+                "creep_speed": "0.1",
+                "creep_distance": "0.5",
             },          
 }
 
